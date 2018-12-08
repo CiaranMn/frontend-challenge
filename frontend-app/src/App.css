@@ -1,18 +1,25 @@
-.App {
+.app {
   text-align: center;
-  width: 100vw;
-  height: 100vh;
+  height: 100%;
 }
 
-.App-header {
+.app-header {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  min-height: 5%;
+  padding: 10px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
   background-color: #28539E;
   color: white;
   font-size: 1.7rem;
   font-weight: bold;
-  min-height: 10%;
-  width: 100%;
+}
 
+.main-container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
 }

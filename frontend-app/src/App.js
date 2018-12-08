@@ -5,6 +5,7 @@ import './App.css'
 
 import API from './lib/API'
 import {NavigationHeader} from './components/NavigationHeader'
+import CalendarGrid from './components/CalendarGrid'
 
 class App extends React.Component {
 
@@ -25,10 +26,13 @@ class App extends React.Component {
 
     // get a decent range in the first fetch so the client doesn't
     // have to wait for further fetches while browsing 
-    // - assumes usage calls for looking forward more than back
+    // - assumes usage calls more for looking at future dates
     API.requestReservedDates(threeMonthsBack, sixMonthsForward)
-      .then(reserved => this.setState({reserved}))
-      .catch(errorMsg => alert(errorMsg))
+      .then(response => 
+        this.setState({
+          reserved: response.payload
+        })
+      ).catch(errorMsg => console.log('Error at 35', errorMsg))
   }
 
   nMonthsBack = (date, n) => {
@@ -41,16 +45,30 @@ class App extends React.Component {
     return new Date(date.getFullYear(), date.getMonth() + (n + 1), 0)   
   }
 
+  handlePrevClicked = () => {
+    const currentView = moment(this.state.currentView).subtract(1, 'month')
+    this.setState({
+      currentView
+    })
+  }
+
+  handleNextClicked = () => {
+    const currentView = moment(this.state.currentView).add(1, 'month')
+    this.setState({
+      currentView
+    })
+  }
+
   render() {
 
-    const {today, currentView} = this.state
+    const {currentView, reserved, today} = this.state
 
     return (
-      <div className="App">
-        <header className="App-header">
-           Spare Room
+      <div className="app">
+        <header className="app-header">
+          Spare Room
         </header>
-        <main className="calendar-container">
+        <div>
           <NavigationHeader
             prevText={
               moment(currentView).subtract(1, 'month').format('MMM YYYY')
@@ -61,11 +79,15 @@ class App extends React.Component {
             nextText={
               moment(currentView).add(1, 'month').format('MMM YYYY')
             }
-            handlePrevClicked={() => this.handlePrevClicked}
-            handleNextClicked={() => this.handleNextClicked}
+            handlePrevClicked={this.handlePrevClicked}
+            handleNextClicked={this.handleNextClicked}
           />
-        
-        </main>
+          <CalendarGrid 
+            currentView={currentView}
+            reserved={reserved}
+            today={today}
+          />
+        </div>
       </div>
 
     )

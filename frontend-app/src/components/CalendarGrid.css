@@ -1,0 +1,79 @@
+.calendar-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  width: 80%;
+  margin: auto;
+  margin-bottom: 25px;
+  flex: 1;
+}
+
+.grid-cell {
+  width: calc(12% - 8px);
+  padding: 8px;
+  font-weight: bold;
+}
+
+.week-day-header {
+  background: rgba(178, 191, 215, 0.9);
+  border: 1px solid black;
+  min-height: 5%;
+}
+
+.calendar-day {
+  display: flex;
+  position: relative;
+  border: 1px solid black;
+  padding-top: 8%;
+}
+
+.calendar-day:hover {
+  cursor: pointer;
+  background-color: #5c89d6;
+  color: white;
+}
+
+.reserved-text {
+  position: absolute;
+  top: 40%;
+  color: red;
+  font-size: 1.1rem;
+  transform: rotate(45deg)
+}
+
+.reserved-day:hover {
+  color: white;
+  backgroudn: red;
+}
+
+.today {
+  border: 1px solid #e60000;
+}
+
+.calenday-day-disabled {
+  display: inline-block;
+  background: grey;
+}
+
+@media screen and (max-width: 600px) {
+
+  .grid-cell {
+    width: 60%;
+  }
+  
+  .week-day-header {
+    display: none;
+  }
+
+  .calendar-day {
+    margin: auto;
+    padding: 10px;
+    display: block;
+  }
+
+  .calendar-day-disabled {
+    display: none;
+  }
+
+}
+

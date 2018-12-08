@@ -25,8 +25,8 @@ export default class API {
   }
 
   // called if validations pass - attempt a fetch and pass the response
-  // to the generic response handler, with itself as callback if further
-  // attempts need to be made following server failure
+  // to the generic response handler, with the function iteslf as callback
+  // in case further attempts need to be made following server failure
   static getReservedDates(dates, attempt = 1) {
     const {start, end} = dates
     return fetch(this.baseUrl + `/reserved/${start}/${end}`)
@@ -37,7 +37,7 @@ export default class API {
           dates, 
           attempt
         )
-    ).catch(err => Promise.reject("The server can't be reached at the moment - please try again in a few minutes."))
+    ).catch(() => Promise.reject("The server can't be reached at the moment - please try again in a few minutes."))
   }
 
   static requestChangeDateStatus(dateToChange, newStatus) {
@@ -69,7 +69,7 @@ export default class API {
           reservationData,
           attempt
        )
-    ).catch(err => Promise.reject("The server can't be reached at the moment - please try again in a few minutes."))
+    ).catch(() => Promise.reject("The server can't be reached at the moment - please try again in a few minutes."))
   }
 
   static handleServerResponse(response, requestFunction, argsObject, attempt) {
@@ -83,7 +83,7 @@ export default class API {
       }
     }
     else if (response.status === 400) {
-      // this should not happen unless request entry methods are bypassed
+      // date validation should not fail unless requestX methods are bypassed
       return Promise.reject('Invalid date(s) supplied to server.')
     }
     else {

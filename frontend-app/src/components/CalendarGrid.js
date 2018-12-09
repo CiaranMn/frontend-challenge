@@ -34,7 +34,7 @@ export default class CalendarGrid extends React.Component {
   renderWeekDayHeader = () => {
     return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
       .map(day =>
-        <div className='week-day-header grid-cell'>
+        <div className='week-day-header grid-cell' key={day}>
           {day}
         </div>
     )
@@ -79,7 +79,7 @@ export default class CalendarGrid extends React.Component {
 
   isDateBooked = date => {
     const { booked } = this.props
-    return booked.find(bookedDate =>
+    return booked && booked.find(bookedDate =>
       this.doDatesMatch(bookedDate, date)
     )
   }

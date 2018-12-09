@@ -32,7 +32,7 @@ class App extends React.Component {
     // get a decent range in the first fetch - we will fetch
     // again when the user approaches the end of the range,
     // checking in the handleNextClick/prevClick methods
-    this.setState({loading: true})
+    this.setState({ loading: true })
     API.requestBookedDates(sixMonthsBack, sixMonthsForward)
       .then(response => 
         this.setState({
@@ -41,7 +41,14 @@ class App extends React.Component {
           latestDateChecked: sixMonthsForward,
           loading: false 
         })
-      ).catch(errorMsg => console.log('Error at 35', errorMsg))
+      ).catch(errorMsg => 
+        this.setState({
+          showHelpModal: true,
+          error: true,
+          helpText: errorMsg,
+          loading: false
+        })
+      )
   }
 
   nMonthsBack = (date, n) => {
@@ -63,9 +70,9 @@ class App extends React.Component {
       loading 
     }, () => {    // if user is approaching end of data fetched, get more
       if (moment(monthInView).subtract(3, 'month')
-        .isBefore(earliestDateChecked)) {
-          this.fetchSixMonthsBack()
-      }
+          .isBefore(earliestDateChecked)) {
+            this.fetchSixMonthsBack()
+        }
     })
   }
 
@@ -79,7 +86,14 @@ class App extends React.Component {
           earliestDateChecked: sixMonthsBack,
           loading: false  // we may have set loading true in handlePrevClicked
         })
-      }).catch(err => console.log(err))
+      }).catch(errMsg => 
+        this.setState({
+          showHelpModal: true,
+          errMsgor: false,
+          helpText: errMsg,
+          loading: false,
+        })
+      )
   }
 
   handleNextClicked = () => {
@@ -106,12 +120,21 @@ class App extends React.Component {
           latestDateChecked: sixMonthsForward,
           loading: false
         })
-      }).catch(err => console.log(err))
+      }).catch(errMsg => this.setState({
+        showHelpModal: true,
+        error: false,
+        helpText: errMsg,
+        loading: false,
+      }))
   }
 
-  requestChangeDateStatus = (date, newBookedStatus )=> {
+  requestChangeDateStatus = (date, newBookedStatus) => {
     if (date.day() === 0) { 
-      return this.setState({showHelpModal: true})
+      return this.setState({
+        showHelpModal: true,
+        error: false,
+        helpText: "Sorry, you aren't able to change the booking status of Sundays."
+      })
     } 
     this.setState({loading: true}, () => {
       API.requestChangeDateStatus(date, newBookedStatus)
@@ -127,6 +150,14 @@ class App extends React.Component {
             })
           }
       }).catch(err => console.log(err))
+    })
+  }
+
+  clearAndCloseModal = () => {
+    this.setState({
+      showHelpModal: false,
+      error: false,
+      helpText: ''
     })
   }
 
@@ -149,7 +180,7 @@ class App extends React.Component {
           <HelpModal 
             error={error}
             helpText={helpText}
-            close={() => this.setState({showHelpModal: false})}
+            close={this.clearAndCloseModal}
           />
         }
 

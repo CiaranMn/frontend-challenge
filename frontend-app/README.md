@@ -4,11 +4,11 @@
 
 The soure code for the app is in `/frontend-app/src`
 
-To run in development mode type `npm start` or `yarn start` while in the `/frontend-app` directory.
+To run in development mode type `npm install && npm start` or `yarn install && yarn start` while in the `/frontend-app` directory.
 
 To run tests `npm test` or `yarn test` while in the `/frontend-app` directory.
 
-Open `index.html` in `/frontend-app/build` for the compiled version.
+The compiled version is in `/frontend-app/build` and can be served with `serve -s build` from within `/frontend-app`
 ##
 ## Dependencies / tools
 

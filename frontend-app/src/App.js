@@ -27,10 +27,10 @@ class App extends React.Component {
     // get a decent range in the first fetch so the client doesn't
     // have to wait for further fetches while browsing 
     // - assumes usage calls more for looking at future dates
-    API.requestReservedDates(threeMonthsBack, sixMonthsForward)
+    API.requestBookedDates(threeMonthsBack, sixMonthsForward)
       .then(response => 
         this.setState({
-          reserved: response.payload
+          booked: response.payload
         })
       ).catch(errorMsg => console.log('Error at 35', errorMsg))
   }
@@ -61,14 +61,14 @@ class App extends React.Component {
 
   render() {
 
-    const {currentView, reserved, today} = this.state
+    const {currentView, booked, today} = this.state
 
     return (
       <div className="app">
         <header className="app-header">
           Spare Room
         </header>
-        <div>
+        <div className="main-container">
           <NavigationHeader
             prevText={
               moment(currentView).subtract(1, 'month').format('MMM YYYY')
@@ -84,7 +84,7 @@ class App extends React.Component {
           />
           <CalendarGrid 
             currentView={currentView}
-            reserved={reserved}
+            booked={booked}
             today={today}
           />
         </div>

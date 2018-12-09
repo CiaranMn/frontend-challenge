@@ -4,13 +4,13 @@ export default class API {
 
   static init() {
     this.baseUrl = "http://localhost:3000"
-    this.getReservedDates = this.getReservedDates.bind(this)
+    this.getBookedDates = this.getBookedDates.bind(this)
     this.changeDateStatus = this.changeDateStatus.bind(this)
   }
 
-  // expects requests for reserved dates to enter via this method
+  // expects requests for booked dates to enter via this method
   // to provide validation of dates before passing onwards
-  static requestReservedDates(startDate, endDate) {
+  static requestBookedDates(startDate, endDate) {
     if (!moment(startDate).isValid()) {
       return Promise.reject('The start date supplied is not valid.')
     } 
@@ -20,20 +20,20 @@ export default class API {
     else {
       const start = moment(startDate).format('YYYY-MM-DD')
       const end = moment(endDate).format('YYYY-MM-DD')
-      return this.getReservedDates({start, end})
+      return this.getBookedDates({start, end})
     }
   }
 
   // called if validations pass - attempt a fetch and pass the response
   // to the generic response handler, with the function iteslf as callback
   // in case further attempts need to be made following server failure
-  static getReservedDates(dates, attempt = 1) {
+  static getBookedDates(dates, attempt = 1) {
     const {start, end} = dates
     return fetch(this.baseUrl + `/reserved/${start}/${end}`)
       .then(response => 
         this.handleServerResponse(
           response, 
-          this.getReservedDates, 
+          this.getBookedDates, 
           dates, 
           attempt
         )

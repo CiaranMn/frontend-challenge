@@ -1,6 +1,8 @@
 import React from 'react'
 import moment from 'moment'
 
+import CalendarDay from './CalendarDay'
+
 import './CalendarGrid.css'
 
 export default class CalendarGrid extends React.Component {
@@ -8,7 +10,9 @@ export default class CalendarGrid extends React.Component {
   constructor() {
     super()
     const mobile = window.matchMedia("(screen and max-width: 600px)").matches
-    this.state = ({mobile})
+    this.state = ({
+      mobile
+    })
   }
 
   componentDidMount() {
@@ -50,49 +54,51 @@ export default class CalendarGrid extends React.Component {
     )
   }
 
-  buildDatesArrayThenRender = () => {
-    const {currentView} = this.props 
+  dateClicked = () => {
+
+  }
+ 
+  mapAndRenderDates = () => {
+    const {currentView, booked, today} = this.props 
+    const { mobile } = this.state
     let dates = []
     const monthStart = moment(currentView).startOf('month')
     const monthEnd = moment(currentView).endOf('month')
-    for (let m = moment(monthStart); m.isBefore(monthEnd); m.add(1, 'days')) {
-      dates.push(moment(m))
+    const leadingSunday = moment(monthStart).startOf('week')
+    const trailingSaturday = moment(monthEnd).endOf('week')
+    for (
+      let date = moment(leadingSunday);
+      date.isBefore(trailingSaturday); 
+      date.add(1, 'days')
+    ) {
+      dates.push(moment(date))
     }
-    return this.renderCalendarDates(dates)
-  }
-
-  renderCalendarDates = dates => {
-    const {mobile} = this.state
-    const {reserved, today} = this.props
-    return dates.map(date => {
-      const isReserved = reserved && this.isDateReserved(date)
-      const isToday = this.doDatesMatch(date, today)
-      return (
-        <div className='calendar-day grid-cell'>
-          <div className='reserved-text'>
-            {isReserved && 'RESERVED'}
-          </div>
-          <div>
-            {mobile 
-              ? 
-              moment(date).format('ddd D MMM YYYY') 
-              : 
-              moment(date).date() 
-            }
-          </div>
-        </div>
+    return dates.map(date => 
+      <CalendarDay 
+        date={date}
+        handleClicked={this.dateClicked}
+        mobile={mobile}
+        isBooked={booked && this.isDateBooked(date)}
+        isToday={this.doDatesMatch(date, today)}
+        isDisabled={
+          moment(date).isBefore(monthStart) 
+          || 
+          moment(date).isAfter(monthEnd)
+          ||
+          date.day() === 0
+        }
+       />
       )
-    })
   }
 
   doDatesMatch = (firstDate, secondDate) => {
     return moment(firstDate).isSame(secondDate, 'day')
   }
 
-  isDateReserved = date => {
-    const { reserved } = this.props
-    return reserved.find(reservedDate =>
-      this.doDatesMatch(reservedDate, date)
+  isDateBooked = date => {
+    const { booked } = this.props
+    return booked.find(bookedDate =>
+      this.doDatesMatch(bookedDate, date)
     )
   }
 
@@ -104,7 +110,7 @@ export default class CalendarGrid extends React.Component {
 
       <div className='calendar-grid'>
         {!mobile ? this.renderWeekDayHeader() : null}
-        {this.buildDatesArrayThenRender()}
+        {this.mapAndRenderDates()}
       </div>
 
     )

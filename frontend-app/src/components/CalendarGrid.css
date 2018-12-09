@@ -1,70 +1,75 @@
 .calendar-grid {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
-  width: 80%;
+  justify-content: center;
+  width: 70%;
   margin: auto;
   margin-bottom: 25px;
-  flex: 1;
-}
-
-.grid-cell {
-  width: calc(12% - 8px);
-  padding: 8px;
-  font-weight: bold;
 }
 
 .week-day-header {
   background: rgba(178, 191, 215, 0.9);
   border: 1px solid black;
-  min-height: 5%;
+  height: 5%;
+}
+
+.grid-cell {
+  width: calc(12% - 10px);
+  padding: 8px;
+  font-weight: bold;
 }
 
 .calendar-day {
   display: flex;
   position: relative;
   border: 1px solid black;
-  padding-top: 8%;
+  padding-top: 6%;
 }
 
-.calendar-day:hover {
+.unbooked:hover {
+  background-image: url('../assets/book.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-color: white;
   cursor: pointer;
-  background-color: #5c89d6;
-  color: white;
 }
 
-.reserved-text {
-  position: absolute;
-  top: 40%;
-  color: red;
-  font-size: 1.1rem;
-  transform: rotate(45deg)
+.booked{
+  background-image: url('../assets/booked.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-color: white;
 }
 
-.reserved-day:hover {
-  color: white;
-  backgroudn: red;
+.booked:hover {
+  background-image: url('../assets/un-book.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-color: white;
+  cursor: pointer;
 }
 
 .today {
-  border: 1px solid #e60000;
+  background: #85a6e0;
 }
 
-.calenday-day-disabled {
-  display: inline-block;
-  background: grey;
+.disabled {
+  cursor: default;
+  color: grey;
+  font-weight: normal;
+  cursor: default;
 }
 
 @media screen and (max-width: 600px) {
+
+  .week-day-header {
+    display: none;
+  }
 
   .grid-cell {
     width: 60%;
   }
   
-  .week-day-header {
-    display: none;
-  }
-
   .calendar-day {
     margin: auto;
     padding: 10px;

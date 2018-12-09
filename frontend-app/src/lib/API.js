@@ -47,13 +47,15 @@ export default class API {
     else {
       const date = moment(dateToChange).format('YYYY-MM-DD')
       return this.changeDateStatus({
-        date, reservation: newStatus
+        date,
+        newStatus
       })
     }
   }
 
   static changeDateStatus(reservationData, attempt = 1) {
     const {date, newStatus} = reservationData
+    console.log(date, newStatus)
     return fetch(this.baseUrl + `/reserved/${date}`, {
       method: 'PUT',
       headers: {

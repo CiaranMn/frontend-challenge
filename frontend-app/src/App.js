@@ -59,6 +59,21 @@ class App extends React.Component {
     })
   }
 
+  requestChangeDateStatus = (date, newBookedStatus )=> {
+    API.requestChangeDateStatus(date, newBookedStatus)
+      .then(resp => {
+        if (!!resp.ok) {
+          let booked = newBookedStatus ? 
+            [...this.state.booked, date.format()]
+            :
+            this.state.booked.filter(d => !moment(d).isSame(date, 'day'))
+          this.setState({
+            booked
+          })
+        }
+    }).catch(err => console.log(err))
+  }
+
   render() {
 
     const {currentView, booked, today} = this.state
@@ -86,6 +101,7 @@ class App extends React.Component {
             currentView={currentView}
             booked={booked}
             today={today}
+            requestChangeDateStatus={this.requestChangeDateStatus}
           />
         </div>
       </div>

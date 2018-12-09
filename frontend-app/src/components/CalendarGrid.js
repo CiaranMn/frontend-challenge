@@ -2,7 +2,6 @@ import React from 'react'
 import moment from 'moment'
 
 import CalendarDay from './CalendarDay'
-
 import './CalendarGrid.css'
 
 export default class CalendarGrid extends React.Component {
@@ -26,7 +25,7 @@ export default class CalendarGrid extends React.Component {
           throttled: true
         }, () => setTimeout(() =>
           this.setState({throttled: false}),
-          200
+          300
         ))
       }
     })
@@ -54,10 +53,6 @@ export default class CalendarGrid extends React.Component {
     )
   }
 
-  dateClicked = () => {
-
-  }
- 
   mapAndRenderDates = () => {
     const {currentView, booked, today} = this.props 
     const { mobile } = this.state
@@ -99,6 +94,13 @@ export default class CalendarGrid extends React.Component {
     const { booked } = this.props
     return booked.find(bookedDate =>
       this.doDatesMatch(bookedDate, date)
+    )
+  }
+
+  dateClicked = date => {
+    this.props.requestChangeDateStatus(
+      date, 
+      !this.isDateBooked(date)
     )
   }
 

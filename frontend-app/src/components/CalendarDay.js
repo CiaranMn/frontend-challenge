@@ -11,7 +11,7 @@ const CalendarDay = ({
 }) => {
 
   return (
-    <div onClick={date => handleClicked(date)}
+    <div onClick={() => !isDisabled && handleClicked(date)}
       className={
         'calendar-day grid-cell '
         + (isToday && ' today ')

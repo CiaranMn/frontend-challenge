@@ -11,11 +11,11 @@ export default class API {
   // expects requests for booked dates to enter via this method
   // to provide validation of dates before passing onwards
   static requestBookedDates(startDate, endDate) {
-    if (!moment(startDate).isValid()) {
-      return Promise.reject('The start date supplied is not valid.')
+    if (!moment(startDate).isValid() | !startDate) {
+      return Promise.reject('No valid start date for the request supplied.')
     } 
-    else if (!moment(endDate).isValid()) {
-      return Promise.reject('The end date supplied is not valid.')
+    else if (!moment(endDate).isValid() | !endDate) {
+      return Promise.reject('No valid end date for the request supplied.')
     } 
     else {
       const start = moment(startDate).format('YYYY-MM-DD')
@@ -39,7 +39,7 @@ export default class API {
           dates, 
           attempt
         )
-    ).catch(() => Promise.reject("The server can't be reached at the moment - please try again in a few minutes."))
+    ).catch(err => Promise.reject(err || "We're having technical issues - please try again in a few minutes."))
   }
 
   // the same pattern is followed here - a validation and formatting gateway
@@ -73,7 +73,7 @@ export default class API {
           reservationData,
           attempt
        )
-    ).catch(() => Promise.reject("The server can't be reached at the moment - please try again in a few minutes."))
+    ).catch(err => Promise.reject(err || "We're having technical issues - please try again in a few minutes."))
   }
 
   // this deals with the responses for both the get and put methods

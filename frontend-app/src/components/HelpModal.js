@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import './HelpModal.css'
 
@@ -18,3 +19,9 @@ const HelpModal = ({error, helpText, close}) => {
 }
 
 export default HelpModal
+
+HelpModal.propTypes = {
+  helpText: PropTypes.string.isRequired,
+  close: PropTypes.func.isRequired,
+  error: PropTypes.bool,
+}

@@ -29,8 +29,8 @@
 .unbooked:hover {
   background-image: url('../assets/book.png');
   background-repeat: no-repeat;
-  background-size: contain;
   background-color: white;
+  background-size: contain;
   cursor: pointer;
 }
 
@@ -43,9 +43,6 @@
 
 .booked:hover {
   background-image: url('../assets/un-book.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-color: white;
   cursor: pointer;
 }
 
@@ -56,7 +53,6 @@
 .disabled {
   cursor: default;
   font-weight: normal;
-  cursor: default;
   opacity: 0.5;
 }
 

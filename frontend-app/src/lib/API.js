@@ -25,8 +25,10 @@ export default class API {
   }
 
   // called if validations pass - attempt a fetch and pass the response
-  // to the generic response handler, with the function iteslf as callback
-  // in case further attempts need to be made following server failure
+  // to the generic response handler, with the function itself as callback
+  // in case further attempts need to be made following server failure.
+  // the arguments specific to this particular method are bundled in an object
+  // to allow the response handler to be agnostic as to what is calling it.
   static getBookedDates(dates, attempt = 1) {
     const {start, end} = dates
     return fetch(this.baseUrl + `/reserved/${start}/${end}`)
@@ -40,6 +42,7 @@ export default class API {
     ).catch(() => Promise.reject("The server can't be reached at the moment - please try again in a few minutes."))
   }
 
+  // the same pattern is followed here - a validation and formatting gateway
   static requestChangeDateStatus(dateToChange, newStatus) {
     if (!moment(dateToChange).isValid()) {
       return Promise.reject('The date supplied is not valid.')
@@ -73,6 +76,7 @@ export default class API {
     ).catch(() => Promise.reject("The server can't be reached at the moment - please try again in a few minutes."))
   }
 
+  // this deals with the responses for both the get and put methods
   static handleServerResponse(response, requestFunction, argsObject, attempt) {
     if (response.status === 500) {
       if (attempt >= 8) {

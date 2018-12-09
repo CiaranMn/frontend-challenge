@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import './NavigationHeader.css'
 
@@ -32,3 +33,11 @@ const NavigationHeader = ({
 }
 
 export default NavigationHeader
+
+NavigationHeader.propTypes = {
+  prevText: PropTypes.string.isRequired,
+  centerText: PropTypes.string.isRequired,
+  nextText: PropTypes.string.isRequired,
+  handlePrevClicked: PropTypes.func.isRequired,
+  handleNextClicked: PropTypes.func.isRequired
+}

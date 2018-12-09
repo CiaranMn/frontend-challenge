@@ -1,5 +1,6 @@
 import React from 'react'
 import moment from 'moment'
+import PropTypes from 'prop-types'
 
 import CalendarDay from './CalendarDay'
 import './CalendarGrid.css'
@@ -9,9 +10,7 @@ export default class CalendarGrid extends React.Component {
   constructor() {
     super()
     const mobile = window.matchMedia("screen and (max-width: 600px)").matches
-    this.state = ({
-      mobile
-    })
+    this.state = ({ mobile })
   }
 
   componentDidMount() {
@@ -41,13 +40,16 @@ export default class CalendarGrid extends React.Component {
   }
 
   mapAndRenderDates = () => {
-    const {monthInView, booked, today} = this.props 
+    const {monthInView, today} = this.props 
     const { mobile } = this.state
     let dates = []
+
     const monthStart = moment(monthInView).startOf('month')
     const monthEnd = moment(monthInView).endOf('month')
     const leadingSunday = moment(monthStart).startOf('week')
     const trailingSaturday = moment(monthEnd).endOf('week')
+    // we will only show the few days either side of the month
+    // on a non-mobile browser
     for (
       let date = moment(mobile ? monthStart : leadingSunday);
       date.isBefore(mobile ? monthEnd : trailingSaturday); 
@@ -62,8 +64,8 @@ export default class CalendarGrid extends React.Component {
         handleClicked={this.dateClicked}
         mobile={mobile}
         isSunday={date.day() === 0}
-        isBooked={booked && this.isDateBooked(date)}
-        isToday={this.doDatesMatch(date, today)}
+        isBooked={!!this.isDateBooked(date)}
+        isToday={!!this.doDatesMatch(date, today)}
         isDisabled={
           moment(date).isBefore(monthStart) 
           || 
@@ -79,7 +81,7 @@ export default class CalendarGrid extends React.Component {
 
   isDateBooked = date => {
     const { booked } = this.props
-    return booked && booked.find(bookedDate =>
+    return booked.find(bookedDate =>
       this.doDatesMatch(bookedDate, date)
     )
   }
@@ -87,7 +89,7 @@ export default class CalendarGrid extends React.Component {
   dateClicked = date => {
     this.props.requestChangeDateStatus(
       date, 
-      !this.isDateBooked(date)
+      !this.isDateBooked(date)  // API expects true or false for new status
     )
   }
 
@@ -104,4 +106,17 @@ export default class CalendarGrid extends React.Component {
 
     )
   }
+}
+
+CalendarGrid.propTypes = {
+  monthInView: PropTypes.oneOfType([
+    PropTypes.instanceOf(Date),
+    PropTypes.instanceOf(moment)
+  ]).isRequired,
+  today: PropTypes.oneOfType([
+    PropTypes.instanceOf(Date), 
+    PropTypes.instanceOf(moment)
+  ]).isRequired,
+  booked: PropTypes.array.isRequired,
+  requestChangeDateStatus: PropTypes.func.isRequired
 }

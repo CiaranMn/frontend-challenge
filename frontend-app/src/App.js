@@ -3,7 +3,6 @@ import moment from 'moment'
 
 import './App.css'
 import spinner from './assets/spinner.gif'
-
 import API from './lib/API'
 import NavigationHeader from './components/NavigationHeader'
 import HelpModal from './components/HelpModal'
@@ -14,13 +13,13 @@ class App extends React.Component {
   constructor() {
     super()
     const today = new Date()
-
     const monthInView = today
     this.state = {
       today,
       monthInView,
       showHelpModal: false,
-      loading: false
+      loading: false,
+      booked: []
     }
   }
 
@@ -41,14 +40,8 @@ class App extends React.Component {
           latestDateChecked: sixMonthsForward,
           loading: false 
         })
-      ).catch(errorMsg => 
-        this.setState({
-          showHelpModal: true,
-          error: true,
-          helpText: errorMsg,
-          loading: false
-        })
       )
+      .catch(errMsg => this.showModalWithError(errMsg))
   }
 
   nMonthsBack = (date, n) => {
@@ -62,13 +55,13 @@ class App extends React.Component {
   handlePrevClicked = () => {
     const { earliestDateChecked } = this.state
     const monthInView = moment(this.state.monthInView).subtract(1, 'month')
-    console.log(monthInView, earliestDateChecked)
+
     // Check if user has overtaken data and show loading indicator if so
     const loading = moment(monthInView).isBefore(earliestDateChecked)
     this.setState({ 
       monthInView, 
       loading 
-    }, () => {    // if user is approaching end of data fetched, get more
+    }, () => {   // if user is approaching or beyond fetched data, get more
       if (moment(monthInView).subtract(3, 'month')
           .isBefore(earliestDateChecked)) {
             this.fetchSixMonthsBack()
@@ -86,14 +79,8 @@ class App extends React.Component {
           earliestDateChecked: sixMonthsBack,
           loading: false  // we may have set loading true in handlePrevClicked
         })
-      }).catch(errMsg => 
-        this.setState({
-          showHelpModal: true,
-          errMsgor: false,
-          helpText: errMsg,
-          loading: false,
-        })
-      )
+      })
+      .catch(errMsg => this.showModalWithError(errMsg))
   }
 
   handleNextClicked = () => {
@@ -120,12 +107,8 @@ class App extends React.Component {
           latestDateChecked: sixMonthsForward,
           loading: false
         })
-      }).catch(errMsg => this.setState({
-        showHelpModal: true,
-        error: false,
-        helpText: errMsg,
-        loading: false,
-      }))
+      })
+      .catch(errMsg => this.showModalWithError(errMsg))
   }
 
   requestChangeDateStatus = (date, newBookedStatus) => {
@@ -136,11 +119,11 @@ class App extends React.Component {
         helpText: "Sorry, you aren't able to change the booking status of Sundays."
       })
     } 
-    this.setState({loading: true}, () => {
+    this.setState({ loading: true }, () => {
       API.requestChangeDateStatus(date, newBookedStatus)
         .then(resp => {
           if (!!resp.ok) {
-            let booked = newBookedStatus ? 
+            let booked = newBookedStatus ? // has it been booked or unbooked?
               [...this.state.booked, date.format()]
               :
               this.state.booked.filter(d => !moment(d).isSame(date, 'day'))
@@ -149,7 +132,16 @@ class App extends React.Component {
               loading: false
             })
           }
-      }).catch(err => console.log(err))
+      }).catch(errMsg => this.showModalWithError(errMsg))
+    })
+  }
+
+  showModalWithError = errMsg => {
+    this.setState({
+      showHelpModal: true,
+      error: false,
+      helpText: errMsg,
+      loading: false,
     })
   }
 

@@ -1,4 +1,6 @@
 import moment from 'moment'
+import 'whatwg-fetch'
+import 'promise-polyfill/src/polyfill'
 
 export default class API {
 

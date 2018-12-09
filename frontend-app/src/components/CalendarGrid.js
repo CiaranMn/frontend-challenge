@@ -81,9 +81,9 @@ export default class CalendarGrid extends React.Component {
 
   isDateBooked = date => {
     const { booked } = this.props
-    return booked.find(bookedDate =>
+    return !!booked.filter(bookedDate =>
       this.doDatesMatch(bookedDate, date)
-    )
+    )[0]
   }
 
   dateClicked = date => {

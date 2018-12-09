@@ -12,51 +12,82 @@ class App extends React.Component {
   constructor() {
     super()
     const today = new Date()
-    const currentView = today
+
+    const monthInView = today
     this.state = {
       today,
-      currentView
+      monthInView
     }
   }
 
   componentDidMount() {
     const {today} = this.state
-    const threeMonthsBack = this.nMonthsBack(today, 3)
+    const sixMonthsBack = this.nMonthsBack(today, 6)
     const sixMonthsForward = this.nMonthsForward(today, 6)
 
-    // get a decent range in the first fetch so the client doesn't
-    // have to wait for further fetches while browsing 
-    // - assumes usage calls more for looking at future dates
-    API.requestBookedDates(threeMonthsBack, sixMonthsForward)
+    // get a decent range in the first fetch - we will fetch
+    // again when the user approaches the end of the range,
+    // checking in the handleNextClick/prevClick methods
+    API.requestBookedDates(sixMonthsBack, sixMonthsForward)
       .then(response => 
         this.setState({
-          booked: response.payload
+          booked: response.payload,
+          earliestDateChecked: sixMonthsBack,
+          latestDateChecked: sixMonthsForward 
         })
       ).catch(errorMsg => console.log('Error at 35', errorMsg))
   }
 
   nMonthsBack = (date, n) => {
-    // the first day of the nth month before a given date
-    return new Date(date.getFullYear(), date.getMonth() - n, 1)
+    return moment(date).subtract(n, 'month').startOf('month')
   }
 
   nMonthsForward = (date, n) => {
-    // the last day of the nth month after a given date
-    return new Date(date.getFullYear(), date.getMonth() + (n + 1), 0)   
+    return moment(date).add(n, 'month').endOf('month')
   }
 
   handlePrevClicked = () => {
-    const currentView = moment(this.state.currentView).subtract(1, 'month')
-    this.setState({
-      currentView
+    const monthInView = moment(this.state.monthInView).subtract(1, 'month')
+    this.setState({ monthInView }, () => {
+      if (moment(monthInView).subtract(3, 'month')
+        .isBefore(this.state.earliestDateChecked)) {
+          this.fetchSixMonthsBack()
+      }
     })
   }
 
+  fetchSixMonthsBack = () => {
+    const { earliestDateChecked } = this.state
+    const sixMonthsBack = this.nMonthsBack(earliestDateChecked, 6)
+    API.requestBookedDates(sixMonthsBack, earliestDateChecked)
+      .then(response => {
+        this.setState({
+          booked: [...response.payload, ...this.state.booked],
+          earliestDateChecked: sixMonthsBack
+        })
+      }).catch(err => console.log(err))
+  }
+
   handleNextClicked = () => {
-    const currentView = moment(this.state.currentView).add(1, 'month')
-    this.setState({
-      currentView
+    const monthInView = moment(this.state.monthInView).add(1, 'month')
+    this.setState({ monthInView }, () => {
+      if (moment(monthInView).add(3, 'month')
+        .isAfter(this.state.latestDateChecked)) {
+        this.fetchSixMonthsForward()
+      }
     })
+  }
+  
+  fetchSixMonthsForward = () => {
+    const { latestDateChecked } = this.state
+    const sixMonthsForward = this.nMonthsForward(latestDateChecked, 6)
+    API.requestBookedDates(latestDateChecked, sixMonthsForward)
+      .then(response => {
+        this.setState({
+          booked: [...this.state.booked, ...response.payload],
+          latestDateChecked: sixMonthsForward
+        })
+      }).catch(err => console.log(err))
   }
 
   requestChangeDateStatus = (date, newBookedStatus )=> {
@@ -76,7 +107,7 @@ class App extends React.Component {
 
   render() {
 
-    const {currentView, booked, today} = this.state
+    const {monthInView, booked, today} = this.state
 
     return (
       <div className="app">
@@ -86,19 +117,19 @@ class App extends React.Component {
         <div className="main-container">
           <NavigationHeader
             prevText={
-              moment(currentView).subtract(1, 'month').format('MMM YYYY')
+              moment(monthInView).subtract(1, 'month').format('MMM YYYY')
             }
             centerText={
-              moment(currentView).format('MMMM YYYY')
+              moment(monthInView).format('MMMM YYYY')
             }
             nextText={
-              moment(currentView).add(1, 'month').format('MMM YYYY')
+              moment(monthInView).add(1, 'month').format('MMM YYYY')
             }
             handlePrevClicked={this.handlePrevClicked}
             handleNextClicked={this.handleNextClicked}
           />
           <CalendarGrid 
-            currentView={currentView}
+            monthInView={monthInView}
             booked={booked}
             today={today}
             requestChangeDateStatus={this.requestChangeDateStatus}

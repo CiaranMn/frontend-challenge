@@ -54,11 +54,11 @@ export default class CalendarGrid extends React.Component {
   }
 
   mapAndRenderDates = () => {
-    const {currentView, booked, today} = this.props 
+    const {monthInView, booked, today} = this.props 
     const { mobile } = this.state
     let dates = []
-    const monthStart = moment(currentView).startOf('month')
-    const monthEnd = moment(currentView).endOf('month')
+    const monthStart = moment(monthInView).startOf('month')
+    const monthEnd = moment(monthInView).endOf('month')
     const leadingSunday = moment(monthStart).startOf('week')
     const trailingSaturday = moment(monthEnd).endOf('week')
     for (
@@ -71,6 +71,7 @@ export default class CalendarGrid extends React.Component {
     return dates.map(date => 
       <CalendarDay 
         date={date}
+        key={date}
         handleClicked={this.dateClicked}
         mobile={mobile}
         isBooked={booked && this.isDateBooked(date)}

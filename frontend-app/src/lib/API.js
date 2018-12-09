@@ -55,7 +55,6 @@ export default class API {
 
   static changeDateStatus(reservationData, attempt = 1) {
     const {date, newStatus} = reservationData
-    console.log(date, newStatus)
     return fetch(this.baseUrl + `/reserved/${date}`, {
       method: 'PUT',
       headers: {

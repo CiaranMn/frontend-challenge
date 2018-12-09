@@ -34,7 +34,7 @@
   cursor: pointer;
 }
 
-.booked{
+.booked {
   background-image: url('../assets/booked.png');
   background-repeat: no-repeat;
   background-size: contain;
@@ -50,15 +50,31 @@
 }
 
 .today {
-  background: #85a6e0;
+  background: #d7e2f4;
 }
 
 .disabled {
   cursor: default;
-  color: grey;
   font-weight: normal;
   cursor: default;
+  opacity: 0.5;
 }
+
+.disabled.booked:hover {
+  background-image: url('../assets/booked.png');
+  cursor: default;
+}
+
+.sunday {
+  color: red;
+  opacity: 0.7;
+}
+
+.sunday.booked:hover {
+  background-image: url('../assets/booked.png');
+  cursor: default;
+}
+
 
 @media screen and (max-width: 600px) {
 

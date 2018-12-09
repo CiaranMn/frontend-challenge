@@ -24,3 +24,10 @@
   flex-direction: row;
   justify-content: center;
 }
+
+.spinner {
+  position: fixed;
+  top: 40%;
+  left: 45%;
+  z-index: 1;
+}

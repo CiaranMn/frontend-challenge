@@ -2,7 +2,7 @@ import React from 'react'
 
 import './NavigationHeader.css'
 
-export const NavigationHeader = ({
+const NavigationHeader = ({
   prevText,
   centerText,
   nextText,
@@ -30,3 +30,5 @@ export const NavigationHeader = ({
 
   )
 }
+
+export default NavigationHeader

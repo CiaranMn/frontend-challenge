@@ -2,9 +2,11 @@ import React from 'react'
 import moment from 'moment'
 
 import './App.css'
+import spinner from './assets/spinner.gif'
 
 import API from './lib/API'
-import {NavigationHeader} from './components/NavigationHeader'
+import NavigationHeader from './components/NavigationHeader'
+import HelpModal from './components/HelpModal'
 import CalendarGrid from './components/CalendarGrid'
 
 class App extends React.Component {
@@ -16,7 +18,9 @@ class App extends React.Component {
     const monthInView = today
     this.state = {
       today,
-      monthInView
+      monthInView,
+      showHelpModal: false,
+      loading: false
     }
   }
 
@@ -28,12 +32,14 @@ class App extends React.Component {
     // get a decent range in the first fetch - we will fetch
     // again when the user approaches the end of the range,
     // checking in the handleNextClick/prevClick methods
+    this.setState({loading: true})
     API.requestBookedDates(sixMonthsBack, sixMonthsForward)
       .then(response => 
         this.setState({
           booked: response.payload,
           earliestDateChecked: sixMonthsBack,
-          latestDateChecked: sixMonthsForward 
+          latestDateChecked: sixMonthsForward,
+          loading: false 
         })
       ).catch(errorMsg => console.log('Error at 35', errorMsg))
   }
@@ -47,10 +53,17 @@ class App extends React.Component {
   }
 
   handlePrevClicked = () => {
+    const { earliestDateChecked } = this.state
     const monthInView = moment(this.state.monthInView).subtract(1, 'month')
-    this.setState({ monthInView }, () => {
+    console.log(monthInView, earliestDateChecked)
+    // Check if user has overtaken data and show loading indicator if so
+    const loading = moment(monthInView).isBefore(earliestDateChecked)
+    this.setState({ 
+      monthInView, 
+      loading 
+    }, () => {    // if user is approaching end of data fetched, get more
       if (moment(monthInView).subtract(3, 'month')
-        .isBefore(this.state.earliestDateChecked)) {
+        .isBefore(earliestDateChecked)) {
           this.fetchSixMonthsBack()
       }
     })
@@ -63,16 +76,21 @@ class App extends React.Component {
       .then(response => {
         this.setState({
           booked: [...response.payload, ...this.state.booked],
-          earliestDateChecked: sixMonthsBack
+          earliestDateChecked: sixMonthsBack,
+          loading: false  // we may have set loading true in handlePrevClicked
         })
       }).catch(err => console.log(err))
   }
 
   handleNextClicked = () => {
+    const { latestDateChecked }= this.state
     const monthInView = moment(this.state.monthInView).add(1, 'month')
-    this.setState({ monthInView }, () => {
-      if (moment(monthInView).add(3, 'month')
-        .isAfter(this.state.latestDateChecked)) {
+    const loading = moment(monthInView).isAfter(latestDateChecked)
+    this.setState({ 
+      monthInView, 
+      loading 
+    }, () => {
+      if (moment(monthInView).add(3, 'month').isAfter(latestDateChecked)) {
         this.fetchSixMonthsForward()
       }
     })
@@ -85,35 +103,64 @@ class App extends React.Component {
       .then(response => {
         this.setState({
           booked: [...this.state.booked, ...response.payload],
-          latestDateChecked: sixMonthsForward
+          latestDateChecked: sixMonthsForward,
+          loading: false
         })
       }).catch(err => console.log(err))
   }
 
   requestChangeDateStatus = (date, newBookedStatus )=> {
-    API.requestChangeDateStatus(date, newBookedStatus)
-      .then(resp => {
-        if (!!resp.ok) {
-          let booked = newBookedStatus ? 
-            [...this.state.booked, date.format()]
-            :
-            this.state.booked.filter(d => !moment(d).isSame(date, 'day'))
-          this.setState({
-            booked
-          })
-        }
-    }).catch(err => console.log(err))
+    if (date.day() === 0) { 
+      return this.setState({showHelpModal: true})
+    } 
+    this.setState({loading: true}, () => {
+      API.requestChangeDateStatus(date, newBookedStatus)
+        .then(resp => {
+          if (!!resp.ok) {
+            let booked = newBookedStatus ? 
+              [...this.state.booked, date.format()]
+              :
+              this.state.booked.filter(d => !moment(d).isSame(date, 'day'))
+            this.setState({
+              booked,
+              loading: false
+            })
+          }
+      }).catch(err => console.log(err))
+    })
   }
 
   render() {
 
-    const {monthInView, booked, today} = this.state
+    const {
+      monthInView, 
+      booked, 
+      today, 
+      loading,
+      showHelpModal, 
+      error, 
+      helpText
+    } = this.state
 
     return (
       <div className="app">
+
+        {showHelpModal && 
+          <HelpModal 
+            error={error}
+            helpText={helpText}
+            close={() => this.setState({showHelpModal: false})}
+          />
+        }
+
+        {loading && 
+          <img src={spinner} className="spinner" alt="loading indicator"/>
+        }
+
         <header className="app-header">
           Spare Room
         </header>
+
         <div className="main-container">
           <NavigationHeader
             prevText={
@@ -135,6 +182,7 @@ class App extends React.Component {
             requestChangeDateStatus={this.requestChangeDateStatus}
           />
         </div>
+        
       </div>
 
     )

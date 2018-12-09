@@ -8,27 +8,14 @@ export default class CalendarGrid extends React.Component {
 
   constructor() {
     super()
-    const mobile = window.matchMedia("(screen and max-width: 600px)").matches
+    const mobile = window.matchMedia("screen and (max-width: 600px)").matches
     this.state = ({
       mobile
     })
   }
 
   componentDidMount() {
-    this.setState({
-      throttled: false
-    })
-    window.addEventListener('resize', () => {
-      if (!this.state.throttled) {
-        this.checkSize()
-        this.setState({
-          throttled: true
-        }, () => setTimeout(() =>
-          this.setState({throttled: false}),
-          300
-        ))
-      }
-    })
+    window.addEventListener('resize', this.checkSize)
   }
 
   componentWillUnmount() {
@@ -36,7 +23,7 @@ export default class CalendarGrid extends React.Component {
   }
 
   checkSize = () => {
-    const mobile = window.matchMedia("(max-width: 600px)").matches
+    const mobile = window.matchMedia("screen and (max-width: 600px)").matches
     if (this.state.mobile !== mobile) {
       this.setState({
         mobile
@@ -62,8 +49,8 @@ export default class CalendarGrid extends React.Component {
     const leadingSunday = moment(monthStart).startOf('week')
     const trailingSaturday = moment(monthEnd).endOf('week')
     for (
-      let date = moment(leadingSunday);
-      date.isBefore(trailingSaturday); 
+      let date = moment(mobile ? monthStart : leadingSunday);
+      date.isBefore(mobile ? monthEnd : trailingSaturday); 
       date.add(1, 'days')
     ) {
       dates.push(moment(date))
@@ -74,14 +61,13 @@ export default class CalendarGrid extends React.Component {
         key={date}
         handleClicked={this.dateClicked}
         mobile={mobile}
+        isSunday={date.day() === 0}
         isBooked={booked && this.isDateBooked(date)}
         isToday={this.doDatesMatch(date, today)}
         isDisabled={
           moment(date).isBefore(monthStart) 
           || 
           moment(date).isAfter(monthEnd)
-          ||
-          date.day() === 0
         }
        />
       )

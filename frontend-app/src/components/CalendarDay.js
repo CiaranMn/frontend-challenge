@@ -5,6 +5,7 @@ const CalendarDay = ({
   isToday, 
   isBooked, 
   isDisabled, 
+  isSunday,
   date, 
   handleClicked,
   mobile
@@ -15,9 +16,10 @@ const CalendarDay = ({
       className={
         'calendar-day grid-cell '
         + (isToday && ' today ')
-        + (isBooked && !isDisabled && ' booked ')
-        + (!isBooked && !isDisabled && ' unbooked ')
+        + (isBooked && ' booked ')
+        + (!isBooked && !isDisabled && !isSunday && ' unbooked ')
         + (isDisabled && ' disabled ')
+        + (isSunday && ' sunday ')
      }>
       {mobile
         ?

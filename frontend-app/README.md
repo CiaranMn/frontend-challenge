@@ -2,7 +2,7 @@
 
 ## Installation
 
-The soure code for the app is in `/frontend-app` with the public build in `/frontend-app/public`
+The soure code for the app is in `/frontend-app/src`
 
 To run in development mode type `npm start` or `yarn start` while in the `/frontend-app` directory.
 

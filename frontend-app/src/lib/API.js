@@ -11,10 +11,10 @@ export default class API {
   // expects requests for booked dates to enter via this method
   // to provide validation of dates before passing onwards
   static requestBookedDates(startDate, endDate) {
-    if (!moment(startDate).isValid() | !startDate) {
+    if (!moment(startDate).isValid() || !startDate) {
       return Promise.reject('No valid start date for the request supplied.')
     } 
-    else if (!moment(endDate).isValid() | !endDate) {
+    else if (!moment(endDate).isValid() || !endDate) {
       return Promise.reject('No valid end date for the request supplied.')
     } 
     else {
@@ -39,7 +39,7 @@ export default class API {
           dates, 
           attempt
         )
-    ).catch(err => Promise.reject(err || "We're having technical issues - please try again in a few minutes."))
+    ).catch(err => Promise.reject(this.parseError(err)))
   }
 
   // the same pattern is followed here - a validation and formatting gateway
@@ -73,7 +73,7 @@ export default class API {
           reservationData,
           attempt
        )
-    ).catch(err => Promise.reject(err || "We're having technical issues - please try again in a few minutes."))
+    ).catch(err => Promise.reject(this.parseError(err)))
   }
 
   // this deals with the responses for both the get and put methods
@@ -82,17 +82,30 @@ export default class API {
       if (attempt >= 8) {
         // At a 10% expected failure rate there's a 1 in 10mil chance of
         // failing 7 times and user has been waiting 10s+ - give up for now.
-        return Promise.reject("The server is experiencing issues at the moment - please try again in a few minutes.")
+        return Promise.reject({message: 'Too many attempts'})
       } else {
         return requestFunction(argsObject, attempt + 1)
       }
     }
     else if (response.status === 400) {
       // date validation should not fail unless requestX methods are bypassed
-      return Promise.reject('Invalid date(s) supplied to server.')
+      return Promise.reject({message: 'Invalid date(s)'})
     }
     else {
       return Promise.resolve(response.json())
+    }
+  }
+
+  // 
+  static parseError(error) {
+    if (error.message === 'Failed to fetch') {
+      return "Unable to connect to the server at the moment - please check your connection or try again in a few minutes."
+    } else if (error.message === 'Too many attempts') {
+      return "The server is having some issues at the moment - please try again in a few minutes"
+    } else if (error.message === 'Invalid date(s)') {
+      return "Invalid dates were supplied to the server - if this keeps happening please contact support."
+    } else {
+      return "Something's gone wrong - please try again in a few minutes. If this happens again, please contact support."
     }
   }
 

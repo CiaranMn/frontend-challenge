@@ -70,7 +70,10 @@ class App extends React.Component {
   }
 
   fetchSixMonthsBack = () => {
-    const { earliestDateChecked } = this.state
+    let { earliestDateChecked } = this.state
+    if (!earliestDateChecked) {   // in case initial fetch failed
+      earliestDateChecked = moment().endOf('month') 
+    }
     const sixMonthsBack = this.nMonthsBack(earliestDateChecked, 6)
     API.requestBookedDates(sixMonthsBack, earliestDateChecked)
       .then(response => {
@@ -98,7 +101,10 @@ class App extends React.Component {
   }
   
   fetchSixMonthsForward = () => {
-    const { latestDateChecked } = this.state
+    let { latestDateChecked } = this.state
+    if (!latestDateChecked) {   // in case initial fetch failed
+      latestDateChecked = moment().endOf('month')
+    }
     const sixMonthsForward = this.nMonthsForward(latestDateChecked, 6)
     API.requestBookedDates(latestDateChecked, sixMonthsForward)
       .then(response => {
@@ -115,7 +121,6 @@ class App extends React.Component {
     if (date.day() === 0) { 
       return this.setState({
         showHelpModal: true,
-        error: false,
         helpText: "Sorry, you aren't able to change the booking status of Sundays."
       })
     } 
@@ -139,7 +144,6 @@ class App extends React.Component {
   showModalWithError = errMsg => {
     this.setState({
       showHelpModal: true,
-      error: false,
       helpText: errMsg,
       loading: false,
     })
@@ -148,7 +152,6 @@ class App extends React.Component {
   clearAndCloseModal = () => {
     this.setState({
       showHelpModal: false,
-      error: false,
       helpText: ''
     })
   }
@@ -161,7 +164,6 @@ class App extends React.Component {
       today, 
       loading,
       showHelpModal, 
-      error, 
       helpText
     } = this.state
 
@@ -170,7 +172,6 @@ class App extends React.Component {
 
         {showHelpModal && 
           <HelpModal 
-            error={error}
             helpText={helpText}
             close={this.clearAndCloseModal}
           />

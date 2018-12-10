@@ -199,6 +199,8 @@ class App extends React.Component {
             handlePrevClicked={this.handlePrevClicked}
             handleNextClicked={this.handleNextClicked}
           />
+        </div>
+        <div>
           <CalendarGrid 
             monthInView={monthInView}
             booked={booked}
